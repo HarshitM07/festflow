@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard - FestFlow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+  <div class="max-w-6xl mx-auto p-6">
+    <h1 class="text-3xl font-bold text-center mb-6">🎯 Admin Event Management</h1>
+
+    <!-- Add Event Form -->
+    <form method="POST" action="/admin/events" class="bg-gray-800 p-6 rounded-lg shadow-md mb-8">
+      <h2 class="text-xl font-semibold mb-4">Add New Event</h2>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <input type="text" name="title" placeholder="Event Title" class="p-2 rounded bg-gray-700 text-white" required />
+        <input type="date" name="date" class="p-2 rounded bg-gray-700 text-white" required />
+        <select name="festType" class="p-2 rounded bg-gray-700 text-white">
+          <option value="Nimbus">Nimbus</option>
+          <option value="Hill'ffair">Hill'ffair</option>
+        </select>
+        <input type="datetime-local" name="registrationDeadline" class="p-2 rounded bg-gray-700 text-white" required />
+      </div>
+
+      <textarea name="description" placeholder="Description" class="mt-4 w-full p-2 rounded bg-gray-700 text-white" rows="4"></textarea>
+
+      <button type="submit" class="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">
+        ➕ Add Event
+      </button>
+    </form>
+
+    <!-- Events List -->
+    <div class="space-y-4">
+      <% events.forEach(event => { %>
+        <div class="bg-gray-800 p-4 rounded-lg shadow flex justify-between items-center">
+          <div>
+            <h3 class="text-xl font-bold"><%= event.title %></h3>
+            <p class="text-sm text-gray-400">📅 <%= new Date(event.date).toDateString() %></p>
+            <p class="text-sm text-gray-400">🎭 Fest: <%= event.festType %></p>
+            <p class="text-sm text-gray-400">👥 Registered: <%= event.attendees.length %></p>
+          </div>
+
+          <div class="space-x-2">
+            <a href="/admin/events/<%= event._id %>/edit" class="bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded">✏️ Edit</a>
+            <form method="POST" action="/admin/events/<%= event._id %>/delete" class="inline">
+              <button type="submit" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded">🗑️ Delete</button>
+            </form>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</body>
+</html>

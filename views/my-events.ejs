@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Events - FestFlow Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen font-sans">
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6 text-center">🛠️ My Events</h1>
+
+    <a href="/admin/add-event" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded mb-6 block text-center w-40 mx-auto">
+    ➕ Add Event
+    </a>
+
+    <% if (events.length === 0) { %>
+      <p class="text-center text-gray-400 text-lg">You haven't created any events yet.</p>
+    <% } else { %>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <% events.forEach(event => { %>
+          <div class="bg-gray-800 p-5 rounded-xl shadow hover:shadow-lg transition">
+            <h2 class="text-xl font-semibold mb-1"><%= event.title %></h2>
+            <p class="text-sm text-gray-400">📅 <%= new Date(event.date).toDateString() %></p>
+            <p class="text-sm text-gray-400">🎉 Fest: <%= event.festType %></p>
+            <p class="text-sm text-gray-400">🏷️ Club: <%= event.createdBy.clubName %></p>
+            <p class="text-sm text-gray-400">📝 Registered Users: <%= event.registrations.length %></p>
+
+            <p class="text-sm text-gray-400">⏳ Deadline: <%= event.registrationDeadline ? new Date(event.registrationDeadline).toLocaleString() : 'Not set' %></p>
+
+            <div class="mt-4 flex justify-between items-center">
+            <a href="/admin/events/<%= event._id %>/edit" class="text-blue-400 hover:underline">✏️ Edit</a>
+            <a href="/admin/events/<%= event._id %>/registrations" class="text-yellow-400 hover:underline">👥 View Registrants</a>
+            <form method="POST" action="/admin/events/<%= event._id %>/delete" onsubmit="return confirm('Are you sure you want to delete this event?');">
+                <button type="submit" class="text-red-400 hover:underline">🗑️ Delete</button>
+            </form>
+            </div>
+
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FestFlow Events</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen font-sans">
+  <div class="max-w-6xl mx-auto p-4 sm:p-6">
+    <h1 class="text-4xl font-bold text-center mb-8">📅 FestFlow Events</h1>
+
+    <% if (events.length === 0) { %>
+      <p class="text-center text-gray-400 text-lg">No events found.</p>
+    <% } else { %>
+      <form method="GET" action="/events-page" class="mb-6 flex flex-wrap gap-4 justify-center">
+        <select name="festType" class="p-2 rounded bg-gray-800 text-white">
+          <option value="">All Fests</option>
+          <option value="Nimbus">Nimbus</option>
+          <option value="Hill'ffair">Hill'ffair</option>
+        </select>
+
+        <input type="text" name="clubName" placeholder="Filter by club name"
+               class="p-2 rounded bg-gray-800 text-white placeholder-gray-400" />
+
+        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+          Filter
+        </button>
+      </form>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <% events.forEach((event, index) => { %>
+          <div class="bg-gray-800 p-5 rounded-xl shadow hover:shadow-lg transition flex flex-col justify-between">
+            <div>
+              <h2 class="text-xl font-bold mb-2"><%= event.title %></h2>
+              <p class="text-sm text-gray-400 mb-1">📅 <%= new Date(event.date).toDateString() %></p>
+              <p class="text-sm text-gray-400 mb-1">⏳ Registration Ends: <%= event.registrationDeadline ? new Date(event.registrationDeadline).toLocaleString() : 'Not set' %></p>
+              <p class="text-sm text-gray-400 mb-2">🎭 Fest: <%= event.festType %></p>
+            </div>
+
+            <div class="mt-4 flex items-center justify-between">
+              <!-- Register Button -->
+              <button
+                id="btn-<%= event._id %>"
+                onclick="registerEvent('<%= event._id %>')"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded flex items-center gap-2">
+                📝 Register
+              </button>
+
+              <!-- Status Message Placeholder -->
+              <p id="msg-<%= event._id %>" class="text-sm mt-2"></p>
+
+              <!-- Live Registration Count -->
+              <div class="text-sm text-purple-300">
+                👥 <span id="count-<%= event._id %>"><%= event.registrations.length %></span> Registered
+              </div>
+            </div>
+
+            <div class="mt-2 text-right">
+              <a href="/events/<%= event._id %>" class="text-sm text-blue-400 hover:underline">🔍 View Details</a>
+            </div>
+          </div>
+
+          <!-- 🔽 Modal (initially hidden) -->
+          <div id="modal-<%= index %>" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+            <div class="bg-gray-800 rounded-xl p-6 max-w-lg w-full relative">
+              <button onclick="closeModal(<%= index %>)" class="absolute top-2 right-3 text-gray-400 hover:text-white text-xl font-bold">&times;</button>
+              <h2 class="text-2xl font-bold text-white mb-2"><%= event.title %></h2>
+              <p class="text-sm text-gray-400 mb-1">📅 Date: <%= new Date(event.date).toDateString() %></p>
+              <p class="text-sm text-gray-400 mb-1">⏳ Registration Ends:
+                <span id="deadline-<%= index %>"><%= new Date(event.registrationDeadline).toLocaleString() %></span>
+              </p>
+              <p class="text-sm text-green-400" id="countdown-<%= index %>"></p>
+              <p class="text-sm text-gray-400 mb-3">🎭 Fest: <%= event.festType %></p>
+              <p class="text-gray-300 mb-4 leading-relaxed"><%= event.description %></p>
+              <p class="text-sm text-gray-500">
+                By <span class="text-gray-300 font-medium"><%= event.createdBy.name %></span>
+                from <span class="text-gray-400"><%= event.createdBy.clubName %></span>
+              </p>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Countdown Script -->
+  <script>
+    function openModal(index) {
+      const modal = document.getElementById('modal-' + index);
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      startCountdown(index);
+    }
+
+    function closeModal(index) {
+      const modal = document.getElementById('modal-' + index);
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    }
+
+    function startCountdown(index) {
+      const deadlineText = document.getElementById('deadline-' + index).innerText;
+      const countdownElement = document.getElementById('countdown-' + index);
+      const endTime = new Date(deadlineText).getTime();
+
+      clearInterval(countdownElement._interval); // Clear any previous
+
+      countdownElement._interval = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = endTime - now;
+
+        if (distance <= 0) {
+          clearInterval(countdownElement._interval);
+          countdownElement.innerText = "⛔ Registration Closed";
+          countdownElement.classList.remove("text-green-400");
+          countdownElement.classList.add("text-red-500");
+          return;
+        }
+
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        countdownElement.innerText = `⏱️ Time left: ${hours}h ${minutes}m ${seconds}s`;
+      }, 1000);
+    }
+  </script>
+
+  <!-- Register Button Handler -->
+  <script>
+    async function registerEvent(eventId) {
+      const response = await fetch(`/api/events/${eventId}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const msgBox = document.getElementById(`msg-${eventId}`);
+      const button = document.getElementById(`btn-${eventId}`);
+      const countElement = document.getElementById(`count-${eventId}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        msgBox.textContent = "✅ Registered successfully!";
+        msgBox.className = "text-green-400 text-sm mt-2";
+
+        if (button) {
+          button.disabled = true;
+          button.innerText = "✅ Registered";
+          button.classList.remove("bg-blue-600");
+          button.classList.add("bg-green-600");
+        }
+
+        if (countElement) {
+          let current = parseInt(countElement.textContent || "0");
+          countElement.textContent = current + 1;
+        }
+      } else {
+        msgBox.textContent = "❌ " + data.error;
+        msgBox.className = "text-red-400 text-sm mt-2";
+      }
+    }
+  </script>
+</body>
+</html>
