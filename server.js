@@ -4,12 +4,14 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const flash = require('connect-flash');
 const path = require('path');
 
 // 🔗 Routes
 const eventRoutes = require('./routes/event');
 const adminRoutes = require('./routes/admin');
 const authRoutes = require('./routes/auth');
+const ensureAdmin = require('./middleware/ensureAdmin');
 
 // 🔍 Models
 const Event = require('./models/Event');
@@ -19,18 +21,19 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ Set EJS as View Engine
+// ✅ View Engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// ✅ Middlewares
-app.use(cors());
-// ✅ Routes
+// ✅ Middleware
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-// ✅ Sessions with MongoDB
+// ✅ Sessions
 app.use(session({
   secret: process.env.SESSION_SECRET || 'festflowsecret',
   resave: false,
@@ -40,30 +43,39 @@ app.use(session({
     collectionName: 'sessions'
   }),
   cookie: {
-    maxAge: 1000 * 60 * 60 * 6, // 6 hours
-    secure: false // set true only in HTTPS
+    maxAge: 1000 * 60 * 60 * 6,
+    secure: false
   }
 }));
+
+// ✅ Flash messages
+app.use(flash());
+
+// ✅ Inject flash messages globally into all EJS views
+app.use((req, res, next) => {
+  res.locals.error = req.flash('error');
+  res.locals.success = req.flash('success');
+  next();
+});
+
+// ✅ Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/admin', adminRoutes);
+
 // ✅ MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-
-
-// ✅ Test Home
+// ✅ Public routes
 app.get('/', (req, res) => {
   res.send('FestFlow API is running 🚀');
 });
 
-// ✅ Events Page (GET with filtering and sorting)
 app.get('/events-page', async (req, res) => {
   try {
-    const { festType, clubName, sortBy } = req.query;
-
+    const { festType, clubName } = req.query;
     let query = {};
     if (festType) query.festType = festType;
 
@@ -76,39 +88,35 @@ app.get('/events-page', async (req, res) => {
       );
     }
 
-    if (sortBy === 'festType') {
-      events.sort((a, b) => a.festType.localeCompare(b.festType));
-    } else if (sortBy === 'clubName') {
-      events.sort((a, b) => {
-        const nameA = a.createdBy.clubName?.toLowerCase() || '';
-        const nameB = b.createdBy.clubName?.toLowerCase() || '';
-        return nameA.localeCompare(nameB);
-      });
-    } else if (sortBy === 'both') {
-      events.sort((a, b) => {
-        const festComp = a.festType.localeCompare(b.festType);
-        if (festComp !== 0) return festComp;
-        const nameA = a.createdBy.clubName?.toLowerCase() || '';
-        const nameB = b.createdBy.clubName?.toLowerCase() || '';
-        return nameA.localeCompare(nameB);
-      });
-    }
-
-    res.render('index', { events });
+    res.render('index', {
+      events,
+      currentUserId: req.session.userId || null,
+      user: {
+        role: req.session.role || null
+      }
+    });
   } catch (err) {
     console.error('🔥 Error loading events:', err.message);
     res.status(500).send('Error loading events');
   }
 });
 
-// ✅ Login View (GET)
+// ✅ Auth-related views
 app.get('/login', (req, res) => {
-  res.render('login'); // Make sure login.ejs exists
+  res.render('login');
 });
 
-// ✅ Admin Dashboard View
-app.get('/admin', (req, res) => {
-  res.render('admin'); // Make sure admin.ejs exists
+app.get('/register', (req, res) => {
+  res.render('register');
+});
+
+// ✅ Admin views
+app.get('/admin', ensureAdmin, (req, res) => {
+  res.render('admin');
+});
+
+app.get('/admin/check-in', ensureAdmin, (req, res) => {
+  res.render('admin-checkin');
 });
 
 // ✅ Start Server

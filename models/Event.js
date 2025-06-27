@@ -26,7 +26,13 @@ const eventSchema = new mongoose.Schema({
   registrations: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
-  }]
+  }],
+
+  checkedInUsers: [{
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'User'
+}],
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('Event', eventSchema);

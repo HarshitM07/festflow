@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register - FestFlow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    function toggleClubField() {
+      const role = document.getElementById("role").value;
+      const clubField = document.getElementById("clubNameField");
+      if (role === "admin") {
+        clubField.classList.remove("hidden");
+      } else {
+        clubField.classList.add("hidden");
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen px-4">
+  <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+    <h2 class="text-2xl font-bold mb-6 text-center">Register on FestFlow</h2>
+
+    <!-- ✅ Flash Messages -->
+    <% if (Array.isArray(error) && error.length > 0) { %>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-center">
+        <%= error[0] %>
+      </div>
+    <% } %>
+    <% if (Array.isArray(success) && success.length > 0) { %>
+      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4 text-center">
+        <%= success[0] %>
+      </div>
+    <% } %>
+
+    <form action="/api/auth/register" method="POST" class="space-y-4">
+      <div>
+        <label class="block font-medium">Name</label>
+        <input type="text" name="name" required class="w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+
+      <div>
+        <label class="block font-medium">Email</label>
+        <input type="email" name="email" required class="w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+
+      <div>
+        <label class="block font-medium">Password</label>
+        <input type="password" name="password" required class="w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+
+      <div>
+        <label class="block font-medium">Role</label>
+        <select name="role" id="role" onchange="toggleClubField()" required class="w-full border border-gray-300 px-3 py-2 rounded">
+          <option value="">-- Select Role --</option>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+
+      <div id="clubNameField" class="hidden">
+        <label class="block font-medium">Club Name</label>
+        <input type="text" name="clubName" class="w-full border border-gray-300 px-3 py-2 rounded" />
+      </div>
+
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
+        Register
+      </button>
+    </form>
+
+    <p class="text-sm mt-4 text-center">
+      Already have an account? <a href="/login" class="text-blue-600 hover:underline">Login</a>
+    </p>
+  </div>
+</body>
+</html>

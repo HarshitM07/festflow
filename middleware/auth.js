@@ -1,18 +1,15 @@
-const jwt = require('jsonwebtoken');
-
 module.exports = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Unauthorized' });
+  // Check if user session exists
+  if (!req.session || !req.session.user) {
+    return res.status(401).json({ error: 'Unauthorized: Please log in first' });
   }
 
-  const token = authHeader.split(' ')[1];
+  // Attach user info from session to req.user
+  req.user = {
+    userId: req.session.user.id,
+    role: req.session.user.role,
+    name: req.session.user.name
+  };
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // { userId, role }
-    next();
-  } catch (err) {
-    res.status(401).json({ error: 'Invalid token' });
-  }
+  next();
 };

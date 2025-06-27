@@ -1,6 +1,6 @@
-module.exports = function ensureAdmin(req, res, next) {
-  if (!req.session.user || req.session.user.role !== 'admin') {
-    return res.redirect('/login'); // Or res.status(403).send('Forbidden')
+module.exports = (req, res, next) => {
+  if (req.session.user && req.session.user.role === 'admin') {
+    return next();
   }
-  next();
+  res.redirect('/login');
 };

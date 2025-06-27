@@ -37,17 +37,35 @@
               <p class="text-sm text-gray-400 mb-2">🎭 Fest: <%= event.festType %></p>
             </div>
 
-            <div class="mt-4 flex items-center justify-between">
-              <!-- Register Button -->
-              <button
-                id="btn-<%= event._id %>"
-                onclick="registerEvent('<%= event._id %>')"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded flex items-center gap-2">
-                📝 Register
-              </button>
+            <div class="mt-4 flex items-center justify-between flex-wrap gap-2">
+              <!-- ✅ Register Button Logic -->
+              <% const isRegistered = event.registrations.some(r => r.toString() === currentUserId?.toString()); %>
 
-              <!-- Status Message Placeholder -->
-              <p id="msg-<%= event._id %>" class="text-sm mt-2"></p>
+              <% if (!user) { %>
+                <button class="bg-blue-600 text-white font-medium px-4 py-2 rounded cursor-not-allowed" disabled>
+                  📝 Register
+                </button>
+                <span class="text-red-400 text-sm ml-2">❌ Unauthorized: Please log in first</span>
+
+              <% } else if (user.role !== 'user') { %>
+                <button class="bg-blue-600 text-white font-medium px-4 py-2 rounded cursor-not-allowed" disabled>
+                  📝 Register
+                </button>
+                <span class="text-red-400 text-sm ml-2">❌ Only regular users can register for events</span>
+
+              <% } else if (isRegistered) { %>
+                <button class="bg-green-600 text-white font-medium px-4 py-2 rounded cursor-not-allowed" disabled>
+                  ✅ Already Registered
+                </button>
+
+              <% } else { %>
+                <button
+                  id="btn-<%= event._id %>"
+                  onclick="registerEvent('<%= event._id %>')"
+                  class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded flex items-center gap-2">
+                  📝 Register
+                </button>
+              <% } %>
 
               <!-- Live Registration Count -->
               <div class="text-sm text-purple-300">
@@ -55,8 +73,11 @@
               </div>
             </div>
 
+            <!-- Status Message Placeholder -->
+            <p id="msg-<%= event._id %>" class="text-sm mt-2"></p>
+
             <div class="mt-2 text-right">
-              <a href="/events/<%= event._id %>" class="text-sm text-blue-400 hover:underline">🔍 View Details</a>
+              <button onclick="openModal(<%= index %>)" class="text-sm text-blue-400 hover:underline">🔍 View Details</button>
             </div>
           </div>
 
@@ -103,7 +124,7 @@
       const countdownElement = document.getElementById('countdown-' + index);
       const endTime = new Date(deadlineText).getTime();
 
-      clearInterval(countdownElement._interval); // Clear any previous
+      clearInterval(countdownElement._interval);
 
       countdownElement._interval = setInterval(() => {
         const now = new Date().getTime();
@@ -131,6 +152,7 @@
     async function registerEvent(eventId) {
       const response = await fetch(`/api/events/${eventId}/register`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         }

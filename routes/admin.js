@@ -1,8 +1,7 @@
-const express = require('express');
+const express = require('express'); 
 const router = express.Router();
 const Event = require('../models/Event');
 const User = require('../models/User');
-const authenticate = require('../middleware/auth');
 const ensureAdmin = require('../middleware/ensureAdmin');
 
 // ✅ My Events Page
@@ -100,6 +99,31 @@ router.post('/events/:id/edit', ensureAdmin, async (req, res) => {
     res.redirect('/admin/my-events');
   } catch (err) {
     console.error('❌ Edit POST Error:', err);
+    res.status(500).send('Server error');
+  }
+});
+
+// ✅ NEW: QR Check-In Page
+router.get('/check-in', ensureAdmin, async (req, res) => {
+  const { eventId } = req.query;
+
+  if (!eventId) {
+    req.flash('error', 'Missing event ID');
+    return res.redirect('/admin/my-events');
+  }
+
+  try {
+    const event = await Event.findById(eventId)
+                             .populate('registrations', 'name email');
+    if (!event) return res.status(404).send('Event not found');
+
+    if (event.createdBy.toString() !== req.session.user.id) {
+      return res.status(403).send('Unauthorized');
+    }
+
+    res.render('admin-checkin', { event });
+  } catch (err) {
+    console.error('❌ QR Check-in Page Error:', err);
     res.status(500).send('Server error');
   }
 });

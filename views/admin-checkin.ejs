@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin QR Check-In | FestFlow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen p-6 font-sans">
+  <div class="max-w-xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-center">📲 QR Code Check-In</h1>
+
+    <form id="checkinForm" class="bg-gray-800 p-6 rounded-lg shadow space-y-4">
+      <label class="block text-sm font-semibold">Paste QR Code Data:</label>
+      <textarea id="qrInput" rows="5" class="w-full bg-gray-700 text-white p-3 rounded resize-none" placeholder='{"userId":"...","eventId":"..."}'></textarea>
+
+      <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+        ✅ Check-In
+      </button>
+
+      <p id="message" class="text-center mt-3 text-sm"></p>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('checkinForm');
+    const qrInput = document.getElementById('qrInput');
+    const message = document.getElementById('message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      message.textContent = '';
+
+      let payload;
+      try {
+        payload = JSON.parse(qrInput.value.trim());
+        if (!payload.userId || !payload.eventId) throw new Error();
+      } catch {
+        message.textContent = '❌ Invalid QR data!';
+        message.className = 'text-red-400 text-center mt-3 text-sm';
+        return;
+      }
+
+      const response = await fetch(`/api/events/${payload.eventId}/check-in`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userId: payload.userId })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        message.textContent = data.message;
+        message.className = 'text-green-400 text-center mt-3 text-sm';
+      } else {
+        message.textContent = '❌ ' + data.error;
+        message.className = 'text-red-400 text-center mt-3 text-sm';
+      }
+    });
+  </script>
+</body>
+</html>
