@@ -46,6 +46,7 @@ This platform helps clubs manage their events and enables users to register, rec
 ```bash
 git clone https://github.com/HarshitM07/FestFlow.git
 cd FestFlow
+```
 
 ### 2️⃣ Install Dependencies
 
