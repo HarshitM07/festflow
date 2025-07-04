@@ -127,5 +127,9 @@ router.get('/check-in', ensureAdmin, async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+// 👥 Redirect QR route to the original one that shows registrations
+router.get('/event/:id/registrants', ensureAdmin, async (req, res) => {
+  res.redirect(`/admin/events/${req.params.id}/registrations`);
+});
 
 module.exports = router;

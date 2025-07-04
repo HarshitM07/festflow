@@ -6,6 +6,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
 const path = require('path');
+const indexRoutes = require('./routes/index');
 
 // 🔗 Routes
 const eventRoutes = require('./routes/event');
@@ -59,6 +60,7 @@ app.use((req, res, next) => {
 });
 
 // ✅ Routes
+app.use('/', indexRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/admin', adminRoutes);
@@ -69,9 +71,7 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
 // ✅ Public routes
-app.get('/', (req, res) => {
-  res.send('FestFlow API is running 🚀');
-});
+
 
 app.get('/events-page', async (req, res) => {
   try {

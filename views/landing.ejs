@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FestFlow | NIT Hamirpur</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #fdfdfd;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .hero {
+      background: linear-gradient(to right, #5a88ff, #7fbcfb);
+      color: white;
+      padding: 100px 20px 80px 20px;
+      text-align: center;
+    }
+    .section-title {
+      font-weight: bold;
+      margin-top: 50px;
+    }
+    .feature-card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      padding: 30px;
+      transition: 0.3s;
+    }
+    .feature-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 30px rgba(0,0,0,0.1);
+    }
+    footer {
+      background-color: #f1f1f1;
+      padding: 30px 20px;
+      text-align: center;
+      margin-top: 50px;
+    }
+    .social-icon {
+      font-size: 1.5rem;
+      color: #0a66c2;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <h1 class="display-4">Welcome to FestFlow</h1>
+    <p class="lead mt-3">The fest management portal for NIT Hamirpur.</p>
+    <a href="/login" class="btn btn-light mt-4 me-3">Login</a>
+    <a href="/register" class="btn btn-outline-light mt-4">Register</a>
+  </div>
+
+  <div class="container">
+    <h2 class="text-center section-title">What is FestFlow?</h2>
+    <p class="text-center text-muted mt-3">
+      FestFlow is a platform made for managing the fests of NIT Hamirpur, specifically <strong>Nimbus</strong> and <strong>Hill'ffair</strong>. It allows campus clubs to create events,
+      register participants, and conduct QR-based check-ins — all in one place.
+    </p>
+
+    <div class="row mt-5 g-4">
+      <div class="col-md-4">
+        <div class="feature-card text-center">
+          <i class="fa-solid fa-calendar-check fa-2x text-primary mb-3"></i>
+          <h5>Event Creation</h5>
+          <p>Clubs from NIT Hamirpur can host and manage their events for Nimbus & Hill'ffair.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card text-center">
+          <i class="fa-solid fa-users fa-2x text-primary mb-3"></i>
+          <h5>Easy Registration</h5>
+          <p>Students of NIT Hamirpur can browse, register, and track events easily.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card text-center">
+          <i class="fa-solid fa-qrcode fa-2x text-primary mb-3"></i>
+          <h5>QR Check-in</h5>
+          <p>Event organizers can manage attendance using secure QR-based check-ins.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Harshit Mahajan</p>
+    <p>Email: mahajanrajinderkumar07@gmail.com</p>
+    <a href="https://www.linkedin.com/in/harshit-mahajan-18250b250/" target="_blank" class="social-icon">
+      <i class="fab fa-linkedin"></i>
+    </a>
+  </footer>
+
+</body>
+</html>

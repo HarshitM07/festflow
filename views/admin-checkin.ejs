@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -19,12 +19,23 @@
 
       <p id="message" class="text-center mt-3 text-sm"></p>
     </form>
+
+    <div class="mt-6 text-center space-x-4">
+      <a href="/admin/my-events" class="inline-block">
+        <button class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded">⬅️ Back to My Events</button>
+      </a>
+
+      <button id="viewRegistrantsBtn" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded hidden">
+        👥 View Registrants
+      </button>
+    </div>
   </div>
 
   <script>
     const form = document.getElementById('checkinForm');
     const qrInput = document.getElementById('qrInput');
     const message = document.getElementById('message');
+    const viewRegistrantsBtn = document.getElementById('viewRegistrantsBtn');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -39,6 +50,12 @@
         message.className = 'text-red-400 text-center mt-3 text-sm';
         return;
       }
+
+      // Enable View Registrants button once QR is parsed
+      viewRegistrantsBtn.classList.remove('hidden');
+      viewRegistrantsBtn.onclick = () => {
+        window.location.href = `/admin/event/${payload.eventId}/registrants`;
+      };
 
       const response = await fetch(`/api/events/${payload.eventId}/check-in`, {
         method: 'POST',
