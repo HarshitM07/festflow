@@ -68,7 +68,8 @@ app.use('/admin', adminRoutes);
 // ✅ MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
+  .catch(err => {console.error('❌ MongoDB connection error:', err);
+        process.exit(1);});
 
 // ✅ Public routes
 
@@ -120,6 +121,7 @@ app.get('/admin/check-in', ensureAdmin, (req, res) => {
 });
 
 // ✅ Start Server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
