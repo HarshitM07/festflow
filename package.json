@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "seed-superadmin": "node scripts/seedSuperAdmin.js"
+    "seed-superadmin": "node scripts/createSuperAdmin.js"
   },
   "keywords": [],
   "author": "",
