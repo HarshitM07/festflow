@@ -7,64 +7,113 @@
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen font-sans">
   <div class="max-w-6xl mx-auto p-4 sm:p-6">
-    <h1 class="text-4xl font-bold text-center mb-8">📅 FestFlow Events</h1>
+    <div class="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
+      <h1 class="text-3xl sm:text-4xl font-bold text-center sm:text-left">
+        <% if (typeof isPast !== 'undefined' && isPast) { %>
+          📜 Past Events
+        <% } else { %>
+          📅 Upcoming Events
+        <% } %>
+      </h1>
+
+      <div class="flex gap-2">
+        <a
+          href="/events-page"
+          class="px-3 py-1 rounded-full text-sm font-semibold
+                <%= !isPast ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-200' %>">
+          Upcoming
+        </a>
+        <a
+          href="/events-page?view=past"
+          class="px-3 py-1 rounded-full text-sm font-semibold
+                <%= isPast ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-200' %>">
+          Past
+        </a>
+      </div>
+    </div>
+
 
     <% if (events.length === 0) { %>
       <p class="text-center text-gray-400 text-lg">No events found.</p>
     <% } else { %>
       <form method="GET" action="/events-page" class="mb-6 flex flex-wrap gap-4 justify-center">
+        <input type="hidden" name="view" value="<%= isPast ? 'past' : '' %>">
         <select name="festType" class="p-2 rounded bg-gray-800 text-white">
           <option value="">All Fests</option>
           <option value="Nimbus">Nimbus</option>
           <option value="Hill'ffair">Hill'ffair</option>
         </select>
 
-        <input type="text" name="clubName" placeholder="Filter by club name"
-               class="p-2 rounded bg-gray-800 text-white placeholder-gray-400" />
+        <input
+          type="text"
+          name="clubName"
+          placeholder="Filter by club name"
+          class="p-2 rounded bg-gray-800 text-white placeholder-gray-400"
+        />
 
-        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+        <button
+          type="submit"
+          class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+        >
           Filter
         </button>
       </form>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <% events.forEach((event, index) => { %>
+        <% events.forEach((event, index) => { 
+             const currentUserId = user ? user.userId : null;
+             const isRegistered = currentUserId
+               ? event.registrations.some(r => r.toString() === currentUserId.toString())
+               : false;
+        %>
           <div class="bg-gray-800 p-5 rounded-xl shadow hover:shadow-lg transition flex flex-col justify-between">
             <div>
               <h2 class="text-xl font-bold mb-2"><%= event.title %></h2>
-              <p class="text-sm text-gray-400 mb-1">📅 <%= new Date(event.date).toDateString() %></p>
-              <p class="text-sm text-gray-400 mb-1">⏳ Registration Ends: <%= event.registrationDeadline ? new Date(event.registrationDeadline).toLocaleString() : 'Not set' %></p>
-              <p class="text-sm text-gray-400 mb-2">🎭 Fest: <%= event.festType %></p>
+              <p class="text-sm text-gray-400 mb-1">
+                📅 <%= new Date(event.date).toDateString() %>
+              </p>
+              <p class="text-sm text-gray-400 mb-1">
+                ⏳ Registration Ends:
+                <%= event.registrationDeadline ? new Date(event.registrationDeadline).toLocaleString() : 'Not set' %>
+              </p>
+              <p class="text-sm text-gray-400 mb-2">
+                🎭 Fest: <%= event.festType %>
+              </p>
             </div>
 
             <div class="mt-4 flex items-center justify-between flex-wrap gap-2">
-              <!-- ✅ Register Button Logic -->
-              <% const isRegistered = event.registrations.some(r => r.toString() === currentUserId?.toString()); %>
-
+              <!-- Register Button Logic -->
               <% if (!user) { %>
-                <button class="bg-blue-600 text-white font-medium px-4 py-2 rounded cursor-not-allowed" disabled>
-                  📝 Register
-                </button>
-                <span class="text-red-400 text-sm ml-2">❌ Unauthorized: Please log in first</span>
-
-              <% } else if (user.role !== 'user') { %>
-                <button class="bg-blue-600 text-white font-medium px-4 py-2 rounded cursor-not-allowed" disabled>
-                  📝 Register
-                </button>
-                <span class="text-red-400 text-sm ml-2">❌ Only regular users can register for events</span>
-
-              <% } else if (isRegistered) { %>
-                <button class="bg-green-600 text-white font-medium px-4 py-2 rounded cursor-not-allowed" disabled>
-                  ✅ Already Registered
-                </button>
-
-              <% } else { %>
+                <!-- Not logged in -->
                 <button
-                  id="btn-<%= event._id %>"
-                  onclick="registerEvent('<%= event._id %>')"
-                  class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded flex items-center gap-2">
+                  class="bg-blue-600 text-white font-medium px-4 py-2 rounded cursor-not-allowed"
+                  disabled
+                >
                   📝 Register
                 </button>
+                <span class="text-yellow-300 text-sm ml-2">
+                  🔑 Login to register
+                </span>
+
+              <% } else if (user.role === 'USER') { %>
+                <!-- Logged in as regular user -->
+                <% if (isRegistered) { %>
+                  <button
+                    class="bg-green-600 text-white font-medium px-4 py-2 rounded cursor-not-allowed"
+                    disabled
+                  >
+                    ✅ Already Registered
+                  </button>
+                <% } else { %>
+                  <button
+                    id="btn-<%= event._id %>"
+                    onclick="registerEvent('<%= event._id %>')"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded flex items-center gap-2"
+                  >
+                    📝 Register
+                  </button>
+                <% } %>
+
               <% } %>
 
               <!-- Live Registration Count -->
@@ -77,25 +126,51 @@
             <p id="msg-<%= event._id %>" class="text-sm mt-2"></p>
 
             <div class="mt-2 text-right">
-              <button onclick="openModal(<%= index %>)" class="text-sm text-blue-400 hover:underline">🔍 View Details</button>
+              <button
+                onclick="openModal(<%= index %>)"
+                class="text-sm text-blue-400 hover:underline"
+              >
+                🔍 View Details
+              </button>
             </div>
           </div>
 
-          <!-- 🔽 Modal (initially hidden) -->
-          <div id="modal-<%= index %>" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+          <!-- Modal (initially hidden) -->
+          <div
+            id="modal-<%= index %>"
+            class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"
+          >
             <div class="bg-gray-800 rounded-xl p-6 max-w-lg w-full relative">
-              <button onclick="closeModal(<%= index %>)" class="absolute top-2 right-3 text-gray-400 hover:text-white text-xl font-bold">&times;</button>
+              <button
+                onclick="closeModal(<%= index %>)"
+                class="absolute top-2 right-3 text-gray-400 hover:text-white text-xl font-bold"
+              >
+                &times;
+              </button>
               <h2 class="text-2xl font-bold text-white mb-2"><%= event.title %></h2>
-              <p class="text-sm text-gray-400 mb-1">📅 Date: <%= new Date(event.date).toDateString() %></p>
-              <p class="text-sm text-gray-400 mb-1">⏳ Registration Ends:
-                <span id="deadline-<%= index %>"><%= new Date(event.registrationDeadline).toLocaleString() %></span>
+              <p class="text-sm text-gray-400 mb-1">
+                📅 Date: <%= new Date(event.date).toDateString() %>
+              </p>
+              <p class="text-sm text-gray-400 mb-1">
+                ⏳ Registration Ends:
+                <span id="deadline-<%= index %>">
+                  <%= new Date(event.registrationDeadline).toLocaleString() %>
+                </span>
               </p>
               <p class="text-sm text-green-400" id="countdown-<%= index %>"></p>
-              <p class="text-sm text-gray-400 mb-3">🎭 Fest: <%= event.festType %></p>
-              <p class="text-gray-300 mb-4 leading-relaxed"><%= event.description %></p>
+              <p class="text-sm text-gray-400 mb-3">
+                🎭 Fest: <%= event.festType %>
+              </p>
+              <p class="text-gray-300 mb-4 leading-relaxed">
+                <%= event.description %>
+              </p>
               <p class="text-sm text-gray-500">
-                By <span class="text-gray-300 font-medium"><%= event.createdBy.name %></span>
-                from <span class="text-gray-400"><%= event.createdBy.clubName %></span>
+                By
+                <span class="text-gray-300 font-medium"><%= event.createdBy.name %></span>
+                <% if (event.club && event.club.name) { %>
+                  from
+                  <span class="text-gray-400"><%= event.club.name %></span>
+                <% } %>
               </p>
             </div>
           </div>
@@ -179,7 +254,7 @@
           countElement.textContent = current + 1;
         }
       } else {
-        msgBox.textContent = "❌ " + data.error;
+        msgBox.textContent = "❌ " + (data.error || "Registration failed");
         msgBox.className = "text-red-400 text-sm mt-2";
       }
     }

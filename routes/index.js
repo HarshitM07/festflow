@@ -3,7 +3,10 @@ const router = express.Router();
 
 // Landing page
 router.get('/', (req, res) => {
-  res.render('landing');
+  // currentUser is already in res.locals from server.js JWT middleware
+  res.render('landing', {
+    user: res.locals.currentUser || null
+  });
 });
 
 module.exports = router;

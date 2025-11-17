@@ -7,42 +7,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body class="bg-gray-900 text-white flex items-center justify-center h-screen px-4">
-  <form action="/api/auth/login" method="POST" class="bg-gray-800 p-8 rounded-lg shadow-md w-full max-w-md">
+  <form action="/login" method="POST" class="bg-gray-800 p-8 rounded-lg shadow-md w-full max-w-md">
 
     <h2 class="text-2xl font-bold mb-6 text-center">Login to FestFlow</h2>
 
-    <!-- ✅ Flash Messages -->
-    <% if (Array.isArray(error) && error.length > 0) { %>
+    <% if (query && query.error) { %>
       <div class="bg-red-500 text-white p-3 rounded mb-4 text-center font-medium shadow">
-        <%= error[0] %>
-      </div>
-    <% } %>
-    <% if (Array.isArray(success) && success.length > 0) { %>
-      <div class="bg-green-500 text-white p-3 rounded mb-4 text-center font-medium shadow">
-        <%= success[0] %>
+        <%= query.error %>
       </div>
     <% } %>
 
-    <!-- ✅ Email -->
+    <% if (query && query.success) { %>
+      <div class="bg-green-500 text-white p-3 rounded mb-4 text-center font-medium shadow">
+        Registration successful! Please log in.
+      </div>
+    <% } %>
+
+
+    <!-- Email -->
     <label class="block mb-4">
       <span class="block text-sm text-gray-300 mb-1">Email</span>
-      <input type="email" name="email" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <input
+        type="email"
+        name="email"
+        required
+        class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
     </label>
 
-    <!-- ✅ Password -->
+    <!-- Password -->
     <label class="block mb-6">
       <span class="block text-sm text-gray-300 mb-1">Password</span>
-      <input type="password" name="password" required class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <input
+        type="password"
+        name="password"
+        required
+        class="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
     </label>
 
-    <!-- ✅ Submit -->
-    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded text-white font-semibold">
+    <!-- Submit -->
+    <button
+      type="submit"
+      class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded text-white font-semibold"
+    >
       Login
     </button>
 
-    <!-- ✅ Link to Register -->
+    <!-- Link to Register -->
     <p class="text-sm mt-4 text-center text-gray-400">
-      Don't have an account? <a href="/register" class="text-blue-400 hover:underline">Register</a>
+      Don't have an account?
+      <a href="/register" class="text-blue-400 hover:underline">Register</a>
     </p>
   </form>
 </body>
