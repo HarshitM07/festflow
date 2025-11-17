@@ -34,11 +34,9 @@ app.use(cors({
   credentials: true
 }));
 
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
 
 // Extract user from JWT (if available) and store in res.locals for EJS
 app.use((req, res, next) => {
@@ -123,22 +121,33 @@ app.get('/events-page', async (req, res) => {
   }
 });
 
-
-
 // Views for login & register
 app.get('/login', (req, res) => res.render('login'));
 app.get('/register', (req, res) => res.render('register'));
 
 // Admin Views (protected)
-app.get('/admin', requireAuth, requireRole('COORDINATOR', 'SUPER_ADMIN'), (req, res) => {
-  res.render('admin');
-});
+app.get(
+  '/admin',
+  requireAuth,
+  requireRole('COORDINATOR', 'SUPER_ADMIN'),
+  (req, res) => {
+    res.render('admin');
+  }
+);
 
-app.get('/admin/check-in', requireAuth, requireRole('COORDINATOR', 'SUPER_ADMIN'), (req, res) => {
-  res.render('admin-checkin');
-});
+app.get(
+  '/admin/check-in',
+  requireAuth,
+  requireRole('COORDINATOR', 'SUPER_ADMIN'),
+  (req, res) => {
+    res.render('admin-checkin');
+  }
+);
 
 // Start Server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on http://0.0.0.0:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
+
+// Export app (good practice)
+module.exports = app;
