@@ -1,41 +1,69 @@
 # 🎉 FestFlow - College Event Management System
 
-FestFlow is a full-stack event management web application designed for colleges, inspired by the fests held at NIT Hamirpur — `Hill'ffair` (Cultural) and `Nimbus` (Technical). 
+**A secure, role-based event management system tailored for college fests.**
 
-This platform helps clubs manage their events and enables users to register, receive confirmation via email, and check in via QR code on the day of the event.
+FestFlow is designed to streamline how colleges manage club-based events, replacing manual Google Forms, WhatsApp broadcasts, Excel sheets, and offline attendance tracking.  
+The project models a **real administrative hierarchy**, ensuring **security, role integrity, and controlled event workflows**.
 
 ---
 
-## 🚀 Features
+---
 
-### 🧑‍💼 For Admins (Clubs)
-- ✅ Create, edit, and delete events
-- ✅ View registrations for each event
-- ✅ Download user lists (CSV support can be added)
-- ✅ Perform QR-based check-ins for participants
+## 📌 Why This Project Matters
 
-### 🙋 For Users (Attendees)
-- ✅ View and explore upcoming events
-- ✅ Filter events by fest type or club name
-- ✅ Register for events (with deadline validation)
-- ✅ Receive email confirmation with unique QR code
+Many college event platforms are simple CRUD apps or form submissions.  
+FestFlow moves beyond that by implementing:
+
+- Verified user onboarding  
+- Access-controlled event publication  
+- QR-secured attendance verification  
+- Governance-based event ownership  
+- Clear separation of active vs past events  
+
+This aligns with **industry-grade backend thinking**, not just academic project development.
+
+---
+
+## 🧩 Role-Based System Design
+
+| Role | Assigned By | Capabilities | Restrictions |
+|------|-------------|--------------|--------------|
+| **Super Admin (Faculty)** | Seed script (one-time setup) | Create/approve clubs, assign coordinator accounts, full visibility | Cannot self-register through UI |
+| **Club Coordinator** | Super Admin | Create & manage events under assigned club, view registrations, perform QR check-ins | Cannot manage other clubs |
+| **Student / User** | Self-register | View events, register, attend via QR | Cannot create events or clubs |
+
+---
+
+## 🚀 Key Features
+
+### 🔐 Authentication & Security
+- JWT-based authentication (stateless, scalable)
+- Secure HTTP-only cookies
+- Mandatory first-login password reset for coordinators
+- No privilege escalation possible via registration
+
+### 📅 Event Lifecycle Management
+- Coordinators create events only for their assigned club
+- Deadline-controlled registrations  
+- Automatic separation of **active** vs **past** events  
+- Email confirmation with unique QR code
+
+### 📍 QR-Based Check-in System
+- Verified check-ins only by authorized coordinators
+- Duplicate and unauthorized check-in prevention
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Technology        | Purpose                  |
-|------------------|---------------------------|
-| Node.js          | Backend runtime           |
-| Express.js       | Web framework             |
-| MongoDB + Mongoose | Database                |
-| EJS              | Server-side rendering     |
-| Tailwind CSS     | Styling                   |
-| bcrypt           | Password hashing          |
-| express-session  | Session handling          |
-| connect-mongo    | Session storage           |
-| connect-flash    | Flash messages (UI)       |
-| nodemailer       | QR code email delivery    |
+| Layer | Technology | Reasoning |
+|--------|------------------------|----------------------|
+| Backend | Node.js + Express.js   | Lightweight & scalable API |
+| Database | MongoDB (Mongoose ORM) | Flexible schema for event metadata |
+| Templating | EJS (SSR) | No SPA overhead, SEO-friendly |
+| Styling | TailwindCSS | Rapid UI development |
+| Auth | JWT + Cookies | Stateless authentication |
+| Email + QR | Nodemailer + QR library | Native confirmation workflow |
 
 ---
 
@@ -59,35 +87,39 @@ npm install
 Create a `.env` file in the root folder:
 
 ```env
-MONGO_URI=mongodb://localhost:27017/festflow
-SESSION_SECRET=yourSuperSecretKey
+MONGO_URI=your_mongo_db_connection
+JWT_SECRET=your_long_random_secret
+MAIL_USER=your_email@gmail.com
+MAIL_PASSWORD=your_google_app_password
+NODE_ENV=development
 ```
 
-### 4️⃣ Start the Server
+### 4️⃣ Run Super Admin Seed Script(only once)
 
 ```bash
-npm run dev
+npm run seed-superadmin
 ```
 
-Then visit: [http://localhost:3000](http://localhost:3000)
+### 5️⃣ Start Server
+
+```bash
+npm start
+```
 
 ---
 
-## 🔒 Admin Credentials
+### 📌 Deployment Notes
+- Built-in QR scanner (mobile-camera)
+- Analytics dashboard (per club & fest)
+- CSV / Excel export
+- Dedicated REST API for mobile app version
+- Notification services (SMS / WhatsApp)
 
-You can:
-
-- Sign up as a new user and select the `admin` role, or
-- Manually update a user in your MongoDB collection to:
-
-```json
-{
-  "name": "Coding Club",
-  "email": "admin@club.com",
-  "role": "admin",
-  "clubName": "Coding Club"
-}
-```
+### 🔮 Future Enhancements
+- Change NODE_ENV=production on deployment
+- Use production-grade JWT secret
+- Never commit .env
+- Use environment variable management provided by platform
 
 ---
 
@@ -95,24 +127,24 @@ You can:
 
 ```
 FestFlow/
-├── models/
-├── routes/
-├── middleware/
-├── views/
-├── public/
-├── server.js
-├── .env
+├── models/ # Database schemas
+├── routes/ # API & view routes
+├── middleware/ # Authentication & authorization
+├── utils/ # QR + email utilities
+├── scripts/ # Super admin seeding
+├── views/ # EJS UI templates
+├── server.js # App bootstrap
 └── README.md
 ```
 
 ---
 
-## 📬 Contact / Contributions
+## 👤 Author
 
-Want to contribute or use this as a base for your college project?  
-Feel free to fork the repo and build on top of it.
+**Harshit Mahajan**  
+Backend Developer | NIT Hamirpur  
+Open for collaborations & improvements.
 
-**Made with ❤️ by Harshit Mahajan**
 
 ---
 
